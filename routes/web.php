@@ -26,6 +26,6 @@ Route::get('/movie/delete{movie}', [MainController :: class, 'movieDelete'])
     ->name('movie.delete'); 
 
 
-    use App\Http\Controllers\ApiController;
+    // use App\Http\Controllers\ApiController;
 
-    Route :: get('/api/v1/movie/all', [ApiController :: class, 'movieAll']);
+    // Route :: get('/api/v1/movie/all', [ApiController :: class, 'movieAll']);
