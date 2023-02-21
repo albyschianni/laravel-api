@@ -2,7 +2,7 @@
 
   import axios from 'axios';
 
-  const API_URL = 'http://127.0.0.1:8001/api/';
+  const API_URL = 'http://127.0.0.1:8000/api/';
   const API_VER = 'v1/';
   const API = API_URL + API_VER;
 
@@ -20,7 +20,7 @@
         genres: [],
         tags: [],
 
-        new_movie: EMPTY_NEW_MOVIE,
+        new_movie: { ...EMPTY_NEW_MOVIE},
 
         state: {
           movieForm: false
@@ -29,12 +29,29 @@
     },
     methods: {
 
+      editMovie(movie) {
+
+        console.log('movie', movie);
+
+        this.new_movie = {...movie};
+
+        this.new_movie.tags_id = [];
+        for (let x=0; x<movie.tags.length; x++){
+
+          const tag = movie.tags[x];
+          this.new_movie.tags_id.push(tag.id);
+        }
+
+        this.state.movieForm = true;
+      },
       submitMovie(e) {
       e.preventDefault();
       
       const new_movie = this.new_movie;
       const actualApi = API + 'movie/store';
      
+      console.log(actualApi);
+      console.log(new_movie);
     
       axios.post(actualApi, new_movie)
            .then(res => {
@@ -50,9 +67,9 @@
            })
            .catch(err => console.log);
     },
-      closeForm() {
+      closeForm() { 
 
-        this.new_movie = EMPTY_NEW_MOVIE;
+        this.new_movie = { ...EMPTY_NEW_MOVIE};
         this.state.movieForm = false;
       },
       updateData() {
@@ -105,7 +122,7 @@
       <br>
       <label for="genre">Genre</label>
       <select name="genre_id" v-model="new_movie.genre_id">
-        <option v-for="genre in genres" :key="genre.id" value="genre.id">{{ genre.name }}</option>
+        <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{ genre.name }}</option>
       </select>
       <br>
       <label>Tag:</label>
@@ -113,9 +130,10 @@
       <div v-for="tag in tags" :key="tag.id">
         <input type="checkbox" :id="'tag-' + tag.id" :value="tag.id" v-model="new_movie.tags_id">
         <label :for="'tag-' + tag.id">{{ tag.name }}</label>
-      </div>
+      </div>  
+      
       <button @click="closeForm">CANCEL</button>
-      <input type="submit" @click="submitMovie" value="CREATE NEW MOVIE">
+      <input type="submit" @click="submitMovie" :value="new_movie.id ?'UPDATE MOVIE' : 'CREATE NEW MOVIE'">
     </form>
 
     <div v-else>
@@ -123,6 +141,8 @@
       <ul>
         <li v-for="movie in movies" :key="movie.id">
           {{ movie.name }}
+          <br>
+          <button @click="editMovie(movie)">EDIT</button>
           <ul>
            <li v-for="tag in movie.tags" :key="tag.id">
               {{ tag.name }}
