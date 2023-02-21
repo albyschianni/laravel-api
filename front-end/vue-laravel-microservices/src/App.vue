@@ -44,11 +44,28 @@
 
         this.state.movieForm = true;
       },
+      deleteMovie(movie){
+
+        axios.get(API + 'movie/delete/' + movie.id)
+             .then(res => {
+
+             const data = res.data;
+             const success = data.success;
+ 
+             if (success)
+                this.updateData();
+             })
+             .catch(err => console.log);
+      },
       submitMovie(e) {
       e.preventDefault();
       
       const new_movie = this.new_movie;
-      const actualApi = API + 'movie/store';
+      const actualApi = API + (
+        new_movie.id
+        ? 'movie/update/' + this.new_movie.id 
+        : 'movie/store'
+      );
      
       console.log(actualApi);
       console.log(new_movie);
@@ -61,7 +78,7 @@
 
             if (success) {
               
-              this.closeForm();
+              this.closeForm(); 
               this.updateData();
             }
            })
@@ -129,7 +146,7 @@
       <br>
       <div v-for="tag in tags" :key="tag.id">
         <input type="checkbox" :id="'tag-' + tag.id" :value="tag.id" v-model="new_movie.tags_id">
-        <label :for="'tag-' + tag.id">{{ tag.name }}</label>
+        <label :for="'tag-' + tag.id">{{ tag.name }}</label>  
       </div>  
       
       <button @click="closeForm">CANCEL</button>
@@ -143,6 +160,7 @@
           {{ movie.name }}
           <br>
           <button @click="editMovie(movie)">EDIT</button>
+          <button @click="deleteMovie(movie)">DELETE</button>
           <ul>
            <li v-for="tag in movie.tags" :key="tag.id">
               {{ tag.name }}
